@@ -2,7 +2,6 @@ package com.app.auth.service.impl.auth;
 
 import com.app.auth.model.dto.response.OperationResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -19,7 +18,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
   private final Logger logger = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
 
   @Override
-  public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+  public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
     logger.error(accessDeniedException.getMessage());
     response.setContentType("application/json");
     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
