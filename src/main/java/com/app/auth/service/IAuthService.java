@@ -6,7 +6,7 @@ import com.app.auth.model.dto.response.AuthResponse;
 import com.app.auth.model.dto.response.OperationResponse;
 
 public interface IAuthService {
-  AuthResponse authenticate(AuthRequest authRequest);
+  AuthResponse authenticateUser(AuthRequest authRequest);
 
-  OperationResponse register(UserRequest userRequest);
+  OperationResponse createUser(UserRequest userRequest);
 }
