@@ -2,12 +2,13 @@ package com.app.auth.service.impl.jwt;
 
 import com.app.auth.util.exception.InternalErrorException;
 import com.app.auth.util.exception.JwtException;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTCreationException;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.auth0.jwt.interfaces.JWTVerifier;
+import org.jose4j.jws.AlgorithmIdentifiers;
+import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.jwt.JwtClaims;
+import org.jose4j.jwt.consumer.InvalidJwtException;
+import org.jose4j.jwt.consumer.JwtConsumer;
+import org.jose4j.jwt.consumer.JwtConsumerBuilder;
+import org.jose4j.lang.JoseException;
 import org.springframework.stereotype.Service;
 
 import java.security.KeyFactory;
@@ -18,15 +19,14 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 public class JwtService {
 
   private final String issuer = System.getenv("JWT_ISSUER");
+  private final String audience = System.getenv("JWT_AUDIENCE");
 
   private RSAPublicKey getPublicKey() {
     try {
@@ -60,22 +60,27 @@ public class JwtService {
     }
   }
 
-  private Algorithm getAlgorithm() {
-    return Algorithm.RSA256(getPublicKey(), getPrivateKey());
-  }
-
-  private String buildToken(String subject, Map<String, Object> claims) {
+  private String buildToken(String subject, Map<String, Object> extraClaims) {
     try {
-      long expiresAt = 1000 * 60 * 60 * 24L;
-      return JWT.create()
-              .withIssuer(issuer)
-              .withSubject(subject)
-              .withPayload(claims)
-              .withIssuedAt(new Date(System.currentTimeMillis()))
-              .withExpiresAt(new Date(System.currentTimeMillis() + expiresAt))
-              .withJWTId(UUID.randomUUID().toString())
-              .sign(getAlgorithm());
-    } catch (JWTCreationException e) {
+      //Set the claims
+      JwtClaims claims = new JwtClaims();
+      claims.setIssuer(issuer);
+      claims.setAudience(audience);
+      claims.setExpirationTimeMinutesInTheFuture(10);
+      claims.setGeneratedJwtId();
+      claims.setIssuedAtToNow();
+      claims.setNotBeforeMinutesInThePast(2);
+      claims.setSubject(subject);
+      for (Map.Entry<String, Object> claim : extraClaims.entrySet()) {
+        claims.setClaim(claim.getKey(), claim.getValue());
+      }
+      //Sign the claims
+      JsonWebSignature jws = new JsonWebSignature();
+      jws.setPayload(claims.toJson());
+      jws.setKey(getPrivateKey());
+      jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
+      return jws.getCompactSerialization();
+    } catch (JoseException e) {
       throw new JwtException("Error creating token", e);
     }
   }
@@ -88,15 +93,18 @@ public class JwtService {
     return buildToken(subject, claims);
   }
 
-  protected String verifyTokenAndGetSubject(String token) {
-    DecodedJWT decodedJWT;
+  protected JwtClaims verifyTokenAndGetClaims(String jwt) {
     try {
-      JWTVerifier verifier = JWT.require(getAlgorithm())
-              .withIssuer(issuer)
+      JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+              .setRequireExpirationTime()
+              .setAllowedClockSkewInSeconds(30)
+              .setRequireSubject()
+              .setExpectedIssuer(issuer)
+              .setExpectedAudience(audience)
+              .setVerificationKey(getPublicKey())
               .build();
-      decodedJWT = verifier.verify(token);
-      return decodedJWT.getSubject();
-    } catch (JWTVerificationException e) {
+      return jwtConsumer.processToClaims(jwt);
+    } catch (InvalidJwtException e) {
       throw new JwtException("Error verifying token", e);
     }
   }
