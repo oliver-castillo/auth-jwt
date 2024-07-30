@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             final String jwt = authHeader.replace("Bearer ", "");
-            final boolean isValid = jwtService.verifyTokenAndGetClaims(jwt);
+            final boolean isValid = jwtService.verifyToken(jwt);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (isValid && authentication == null) {
                 final String username = jwtService.getSubject(jwt);
