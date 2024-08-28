@@ -1,6 +1,6 @@
 package com.app.auth.service;
 
-import com.app.auth.model.dto.request.UserRequest;
+import com.app.auth.model.dto.request.UpdateUserRequest;
 import com.app.auth.model.dto.response.OperationResponse;
 import com.app.auth.model.dto.response.UserResponse;
 
@@ -11,7 +11,7 @@ public interface IUserService {
 
   UserResponse getUserById(Long id);
 
-  OperationResponse updateUser(UserRequest userRequest);
+  OperationResponse updateUser(UpdateUserRequest request);
 
   OperationResponse deleteUser(Long id);
 }
