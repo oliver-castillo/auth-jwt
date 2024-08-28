@@ -57,7 +57,7 @@ public class JwtService {
     }
 
     private String buildToken(String subject, Map<String, Object> extraClaims) {
-        final long expiration = System.currentTimeMillis() + 1;
+        final long expiration = System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7;
         return Jwts.builder()
                 .claims(extraClaims)
                 .subject(subject)
