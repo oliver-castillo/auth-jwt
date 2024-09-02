@@ -1,7 +1,7 @@
 package com.app.auth.service.impl.auth;
 
 import com.app.auth.model.dto.request.AuthRequest;
-import com.app.auth.model.dto.request.UserRequest;
+import com.app.auth.model.dto.request.CreateUserRequest;
 import com.app.auth.model.dto.response.AuthResponse;
 import com.app.auth.model.dto.response.OperationResponse;
 import com.app.auth.model.entity.User;
@@ -21,31 +21,31 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthService implements IAuthService {
-  private final IUserRepository userRepository;
-  private final IUserMapper userMapper;
-  private final PasswordEncoder passwordEncoder;
-  private final JwtService jwtService;
-  private final AuthenticationManager authenticationManager;
+    private final IUserRepository userRepository;
+    private final IUserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
-  @Override
-  public AuthResponse authenticateUser(AuthRequest authRequest) {
-    Authentication auth = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                    authRequest.getUsername(),
-                    authRequest.getPassword()));
-    UserDetails userDetails = (UserDetails) auth.getPrincipal();
-    return new AuthResponse(jwtService.generateToken(userDetails.getUsername()));
-  }
-
-  @Override
-  public OperationResponse createUser(UserRequest userRequest) {
-    if (userRepository.findByUsername(userRequest.getUsername()).isEmpty()) {
-      User user = userMapper.toEntity(userRequest);
-      user.setPassword(passwordEncoder.encode(user.getPassword()));
-      userRepository.save(user);
-      return new OperationResponse("User registered successfully");
-    } else {
-      throw new BadRequestException("Username already exists");
+    @Override
+    public AuthResponse authenticateUser(AuthRequest authRequest) {
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        authRequest.getUsername(),
+                        authRequest.getPassword()));
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        return new AuthResponse(jwtService.generateToken(userDetails.getUsername()));
     }
-  }
+
+    @Override
+    public OperationResponse createUser(CreateUserRequest userRequest) {
+        if (userRepository.findByUsername(userRequest.getUsername()).isEmpty()) {
+            User user = userMapper.toEntity(userRequest);
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            userRepository.save(user);
+            return new OperationResponse("User registered successfully");
+        } else {
+            throw new BadRequestException("Username already exists");
+        }
+    }
 }

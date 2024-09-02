@@ -1,4 +1,4 @@
-# Sistema de autenticación de usuarios con Spring Boot y Spring Security mediante JWT utilizando la librería java-jwt de Auth0
+# Sistema de autenticación de usuarios con Spring Boot y Spring Security mediante JWT utilizando la librería jose4j (org.bitbucket.b_c)
 
 ## Configuración del proyecto
 
