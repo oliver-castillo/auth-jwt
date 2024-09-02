@@ -1,32 +1,21 @@
-# Sistema de autenticación de usuarios con Spring Boot y Spring Security mediante JWT utilizando la librería java-jwt de Auth0
+# Autenticación de usuarios con Spring Boot y Spring Security mediante JWT utilizando diferentes librerías
 
-## Configuración del proyecto
+Este repositorio contiene varios proyectos de ejemplo que ilustran cómo utilizar diferentes librerías para autenticar usuarios en una aplicación Spring Boot utilizando JWT (JSON Web Token).
+En la rama ```main``` se encuentran todos los proyectos almacenados en carpetas diferentes`. Para acceder a un proyecto en específico puedes cambiar a la rama correspondiente.
 
-### 1. Generación de llaves (pública y privada)
+### Ejemplo:
+```git checkout <nombre-de-la-rama>```
 
-#### Generar llave privada
+Este proyecto fue realizado con la versión 21 de Java y Spring Boot 3.3.2.
 
-```bash
-openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:4096
-```
+## ¿Qué es JWT?
 
-#### Generar llave pública
+JSON Web Token (JWT) es un estándar abierto para la creación de tokens de seguridad. Está diseñado para ser utilizado en aplicaciones web y móviles, donde se requiere una forma de autenticación segura y eficiente.
 
-```bash
-openssl rsa -pubout -in private_key.pem -out public_key.pem
-```
+## ¿Qué es Spring Boot?
 
-### 2. Configuración de las variables de entorno
+Spring Boot es una plataforma de desarrollo de aplicaciones Java que simplifica la creación de aplicaciones Spring. Proporciona una serie de características integradas, como la configuración automática, la integración con otros frameworks y herramientas, y la capacidad de crear aplicaciones de alto rendimiento.
 
-```
-JWT_ISSUER  =   auth0
-PUBLIC_KEY  =   public_key.pem
-PRIVATE_KEY =   private_key.pem
-```
+## ¿Qué es Spring Security?
 
-### 3. Configuración de la base de datos
-
-```SQL
-CREATE
-DATABASE my_db;
-```
+Spring Security es una librería de seguridad de aplicaciones Java que proporciona una serie de funcionalidades para la gestión de usuarios, la autenticación y autorización, y la protección de recursos.
